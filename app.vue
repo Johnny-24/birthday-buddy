@@ -1,31 +1,59 @@
 <template>
-  <div class="container">
-    <form class="form" v-if="!authSuccess" @submit.prevent="auth">
-      <input type="text" placeholder="Логин" v-model="login" :required="true">
-      <input type="password" placeholder="Пароль" v-model="password" :required="true">
-      <button type="submit">Войти</button>
-    </form>
-
-    <div  v-else>
-      <form class="form" @submit.prevent="add">
-        <input type="text" placeholder="ФИО" v-model="newName" :required="true">
-        <input type="date" placeholder="Дата" v-model="newDate" :required="true">
-        <button type="submit">Добавить</button>
-      </form>
-      <div v-if="!list.length">Пусто</div>
-      <ul v-else>
-        <li class="item" :class="item.status" v-for="(item, index) in list" :key="item.id">
-          {{ index + 1 }}
-          <div class="info" v-show="!item.edit"> {{ item.name }} {{ item.date }} </div>
-          <form @submit.prevent="save(index)" :style="{padding: '0 5px'}">
-            <input v-show="item.edit" type="text" placeholder="ФИО" v-model="editName" :required="true">
-            <input v-show="item.edit" type="date" placeholder="Дата" v-model="editDate" :required="true">
-            <button v-show="item.edit" type="submit" :style="{marginLeft: '5px'}">Сохранить</button>
-          </form>
-          <div class="controlls">
-            <button v-show="!item.edit" type="button" @click="edit({ index, value: !item.edit })">Редактировать</button>
-            <button v-show="!item.edit" type="button" @click="del(item.id)">Удалить</button>
+  <div class="container-sm auth-container">
+    <div class="row auth-form" v-if="!authSuccess">
+      <div class="col">
+        <!-- Авторизация -->
+        <form @submit.prevent="auth">
+          <div class="mb-3">
+            <label for="name" class="form-label">Имя</label>
+            <input type="text" class="form-control" id="name" v-model="login" :required="true">
           </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Пароль</label>
+            <input type="password" class="form-control" id="password" v-model="password" :required="true">
+          </div>
+          <div class="text-danger mb-3" v-show="authError">Неверный логин или пароль</div>
+          <button type="submit" class="btn btn-primary">Войти</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="container" v-else>
+      <!-- Добавление -->
+      <div class="d-flex justify-content-center mb-3">
+        <form class="form btn-group" @submit.prevent="add">
+          <input class="form-control" id="name" type="text" placeholder="Имя" v-model="newName" :required="true">
+          <input class="form-control" id="date" type="date" placeholder="Год" v-model="newDate">
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </form>
+      </div>
+
+
+
+
+      <!-- Пусто -->
+      <div v-if="!list.length" class="text-center">Пусто</div>
+
+      <!-- Список -->
+      <ul v-else class="list-group">
+        <li class="list-group-item d-flex" :class="item.status" v-for="(item, index) in list" :key="item.id">
+            <div class="d-flex align-items-center me-3">{{ index + 1 }}</div>
+            <div v-if="!item.edit" class="d-flex align-items-center p-0">{{ item.name }} {{ item.date }}</div>
+            <div class="ms-auto" v-show="!item.edit">
+              <button class="btn btn-warning" v-show="!item.edit" type="button" @click="edit({ index, value: !item.edit })"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-danger" v-show="!item.edit" type="button" @click="del(item.id)"><i class="bi bi-trash3"></i></button>
+            </div>
+            <form class="col d-flex" @submit.prevent="save(index)" :style="{padding: '0 5px'}" v-if="item.edit">
+              <div class="col-6">
+                <input class="form-control" type="text" placeholder="ФИО" v-model="editName" :required="true">
+              </div>
+              <div class="col-3">
+                <input class="form-control" type="date" placeholder="Дата" v-model="editDate" :required="true">
+              </div>
+              <div class="ms-auto">
+                <button class="btn btn-success" type="submit" :style="{marginLeft: '5px'}"><i class="bi bi-check-square"></i></button>
+              </div>
+            </form>
         </li>
       </ul>
     </div>
@@ -33,12 +61,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+
+useHead({
+  link: [
+    {
+      href: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css',
+      rel: 'stylesheet'
+    },
+    {
+      href: 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css',
+      rel: 'stylesheet'
+    }
+  ]
+})
 
 const authSuccess = ref(false)
 const login = ref('')
 const password = ref('')
-
+const authError = ref(false)
 const authData = reactive({
   login: '231231',
   password: '231231'
@@ -52,6 +93,23 @@ const editName = ref('')
 
 const list = ref([])
 
+watch([login, password], () => {
+  authError.value = false
+})
+
+const sort = (arr) => {
+  arr.sort((a, b) => {
+  const dateA = new Date(a.date);
+  const dateB = new Date(b.date);
+
+  if (dateA.getMonth() === dateB.getMonth()) {
+    return dateA.getDate() - dateB.getDate();
+  } else {
+    return dateA.getMonth() - dateB.getMonth();
+  }
+});
+}
+
 const add = () => {
   const item = {
     id: Date.now(),
@@ -64,9 +122,12 @@ const add = () => {
     ...list.value,
     item
   ]
-  list.value = newList
+
   newName.value = ''
   newDate.value = ''
+
+  const newArray = sort(newList)
+  list.value = newArray
 }
 
 const edit = ({ index, value }) => {
@@ -88,6 +149,9 @@ const save = (index) => {
   list.value.forEach(i => {
     i.edit = false
   })
+
+  const newArray = sort(list.value)
+  list.value = newArray
 }
 
 const del = (id) => {
@@ -99,6 +163,8 @@ const auth = () => {
   if (authData.login === login.value && authData.password === password.value) {
     authSuccess.value = true
     localStorage.setItem('auth', JSON.stringify(true))
+  } else {
+    authError.value = true
   }
 }
 
@@ -107,42 +173,24 @@ onMounted(() => {
   if (savedAuthData === 'true') {
     authSuccess.value = true
   }
+  if (list.value.length) {
+    const newArray = sort(list.value)
+    list.value = newArray
+  }
 })
 </script>
 
 <style>
-body {
-  margin: 0;
-}
-.form {
-  margin-bottom: 20px;
-}
-ul {
-  padding: 0;
-}
-.container {
-  flex-direction: column;
+.auth-container {
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100vh;
 }
-.info {
-  padding: 0 15px;
-  margin-right: auto;
-}
-.item {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px;
-  border: 1px solid black;
-  margin-bottom: 15px;
-}
-.danger {
-  color: red;
-}
-.warning {
-  color: orange;
+
+.auth-form {
+    border: 1px solid #dee2e6;
+    padding: 20px;
+    width: 100%;
 }
 </style>
