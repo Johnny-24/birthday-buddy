@@ -28,15 +28,12 @@
         </form>
       </div>
 
-
-
-
       <!-- Пусто -->
-      <div v-if="!list.length" class="text-center">Пусто</div>
+      <div v-if="!filteredList.length" class="text-center">Пусто</div>
 
       <!-- Список -->
       <ul v-else class="list-group">
-        <li class="list-group-item d-flex" :class="item.status" v-for="(item, index) in list" :key="item.id">
+        <li class="list-group-item d-flex" :class="item.status" v-for="(item, index) in filteredList" :key="item.id">
             <div class="d-flex align-items-center me-3">{{ index + 1 }}</div>
             <div v-if="!item.edit" class="d-flex align-items-center p-0">{{ item.name }} {{ item.date }}</div>
             <div class="ms-auto" v-show="!item.edit">
@@ -61,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 
 useHead({
   link: [
@@ -98,16 +95,17 @@ watch([login, password], () => {
 })
 
 const sort = (arr) => {
-  arr.sort((a, b) => {
-  const dateA = new Date(a.date);
-  const dateB = new Date(b.date);
+  const copyArr = JSON.parse(JSON.stringify(arr))
+  return copyArr.sort((a, b) => {
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
 
-  if (dateA.getMonth() === dateB.getMonth()) {
-    return dateA.getDate() - dateB.getDate();
-  } else {
-    return dateA.getMonth() - dateB.getMonth();
-  }
-});
+    if (dateA.getMonth() === dateB.getMonth()) {
+      return dateA.getDate() - dateB.getDate()
+    } else {
+      return dateA.getMonth() - dateB.getMonth()
+    }
+  })
 }
 
 const add = () => {
@@ -126,9 +124,16 @@ const add = () => {
   newName.value = ''
   newDate.value = ''
 
-  const newArray = sort(newList)
-  list.value = newArray
+  list.value = newList
 }
+
+const filteredList = computed(() => {
+  if (list.value.length > 1) {
+    const res = sort(list.value)
+    return res
+  }
+  return list.value
+})
 
 const edit = ({ index, value }) => {
   list.value.forEach(i => {
@@ -172,10 +177,6 @@ onMounted(() => {
   const savedAuthData = localStorage.getItem('auth')
   if (savedAuthData === 'true') {
     authSuccess.value = true
-  }
-  if (list.value.length) {
-    const newArray = sort(list.value)
-    list.value = newArray
   }
 })
 </script>
