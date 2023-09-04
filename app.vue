@@ -23,7 +23,7 @@
       <div class="d-flex justify-content-center mb-3">
         <form class="form btn-group" @submit.prevent="add">
           <input class="form-control" id="name" type="text" placeholder="Имя" v-model="newName" :required="true">
-          <input class="form-control" type="date" placeholder="Год" v-model="newDate">
+          <input class="form-control" type="date" placeholder="Год" v-model="newDate" :required="true">
 
           <button type="submit" class="btn btn-primary">Добавить</button>
         </form>
@@ -110,28 +110,6 @@ const sort = (arr) => {
   })
 }
 
-const findClosestIndex = (arr) => {
-  let closestIndex = 0;
-  let closestDifference = Infinity;
-
-  for (let i = 0; i < arr.length; i++) {
-    const dateParts = arr[i].date.split('-');
-    const month = parseInt(dateParts[1]);
-    const day = parseInt(dateParts[2]);
-
-    const currentDate = new Date(today.value.getFullYear(), month - 1, day); // Создаем дату без года
-
-    const difference = Math.abs(currentDate - today.value);
-
-    if (difference < closestDifference) {
-      closestIndex = i;
-      closestDifference = difference;
-    }
-  }
-
-  return closestIndex;
-}
-
 const add = () => {
   const item = {
     id: Date.now(),
@@ -151,25 +129,48 @@ const add = () => {
   list.value = newList
 }
 
+const currentMonth = computed(() => {
+  return today.value.getMonth() + 1
+})
+
+const currentDate = computed(() => {
+  return today.value.getDate()
+})
+
 const filteredList = computed(() => {
   if (list.value.length > 1) {
     let res = sort(list.value)
-
-    const currentMonth = today.value.getMonth() + 1
-    const currentDate = today.value.getDate()
 
     const lastArr = []
     res.forEach(i => {
       const IMonthArr = i.date.split('-')
       const IMonth = parseInt(IMonthArr[1])
       const IDay = parseInt(IMonthArr[2])
-      if (IMonth < currentMonth || IMonth === currentMonth && IDay < currentDate) {
+      if (IMonth < currentMonth.value || IMonth === currentMonth.value && IDay < currentDate.value) {
         lastArr.push(i)
       }
     })
 
     res = [...res, ...lastArr]
     res = res.slice(lastArr.length)
+
+    res.forEach(i => {
+      const IMonthArr = i.date.split('-')
+      const IMonth = parseInt(IMonthArr[1])
+      const IDay = parseInt(IMonthArr[2])
+
+      if (IMonth === currentMonth.value && (IDay - currentDate.value === 0)) {
+        i.status = 'text-success'
+      }
+
+      if (IMonth === currentMonth.value && (IDay - currentDate.value === 1)) {
+        i.status = 'text-danger'
+      }
+
+      if (IMonth === currentMonth.value && (IDay - currentDate.value === 2)) {
+        i.status = 'text-warning'
+      }
+    })
 
     return res
   }
