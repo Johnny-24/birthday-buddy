@@ -23,7 +23,20 @@
       <div class="d-flex justify-content-center mb-3">
         <form class="form btn-group" @submit.prevent="add">
           <input class="form-control" id="name" type="text" placeholder="Имя" v-model="newName" :required="true">
-          <input class="form-control" id="date" type="date" placeholder="Год" v-model="newDate">
+
+          <!-- День -->
+          <select class="form-select" v-model="newDay">
+            <option :value="index + 1" v-for="(day, index) in 31" :key="index">{{ day }}</option>
+          </select>
+
+          <!-- Месяц -->
+          <select class="form-select" v-model="newMonth">
+            <option :value="index + 1" v-for="(month, index) in months" :key="index">{{ month }}</option>
+          </select>
+
+          <!-- Год -->
+          <input class="form-control" type="number" placeholder="Год" v-model="newYear">
+
           <button type="submit" class="btn btn-primary">Добавить</button>
         </form>
       </div>
@@ -73,6 +86,21 @@ useHead({
   ]
 })
 
+const months = ref([
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь'
+])
+
 const authSuccess = ref(false)
 const login = ref('')
 const password = ref('')
@@ -82,11 +110,16 @@ const authData = reactive({
   password: '231231'
 })
 
-const newDate = ref('')
 const newName = ref('')
 
 const editDate = ref('')
 const editName = ref('')
+
+const newDate = ref('')
+
+const newDay = ref('1')
+const newMonth = ref('1')
+const newYear = ref('')
 
 const list = ref([])
 
@@ -113,6 +146,9 @@ const add = () => {
     id: Date.now(),
     name: newName.value,
     date: newDate.value,
+    day: newDay.value,
+    month: newMonth.value,
+    year: newYear.value,
     edit: false,
     status: 'default'
   }
