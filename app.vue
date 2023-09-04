@@ -23,19 +23,7 @@
       <div class="d-flex justify-content-center mb-3">
         <form class="form btn-group" @submit.prevent="add">
           <input class="form-control" id="name" type="text" placeholder="Имя" v-model="newName" :required="true">
-
-          <!-- День -->
-          <select class="form-select" v-model="newDay">
-            <option :value="index + 1" v-for="(day, index) in 31" :key="index">{{ day }}</option>
-          </select>
-
-          <!-- Месяц -->
-          <select class="form-select" v-model="newMonth">
-            <option :value="index + 1" v-for="(month, index) in months" :key="index">{{ month }}</option>
-          </select>
-
-          <!-- Год -->
-          <input class="form-control" type="number" placeholder="Год" v-model="newYear">
+          <input class="form-control" type="date" placeholder="Год" v-model="newDate">
 
           <button type="submit" class="btn btn-primary">Добавить</button>
         </form>
@@ -86,20 +74,7 @@ useHead({
   ]
 })
 
-const months = ref([
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь'
-])
+const today = ref(new Date())
 
 const authSuccess = ref(false)
 const login = ref('')
@@ -111,15 +86,11 @@ const authData = reactive({
 })
 
 const newName = ref('')
+const newDate = ref('')
 
 const editDate = ref('')
 const editName = ref('')
 
-const newDate = ref('')
-
-const newDay = ref('1')
-const newMonth = ref('1')
-const newYear = ref('')
 
 const list = ref([])
 
@@ -128,17 +99,37 @@ watch([login, password], () => {
 })
 
 const sort = (arr) => {
-  const copyArr = JSON.parse(JSON.stringify(arr))
-  return copyArr.sort((a, b) => {
-    const dateA = new Date(a.date)
-    const dateB = new Date(b.date)
+  return arr.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
 
-    if (dateA.getMonth() === dateB.getMonth()) {
-      return dateA.getDate() - dateB.getDate()
-    } else {
-      return dateA.getMonth() - dateB.getMonth()
-    }
+    const monthDayA = dateA.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+    const monthDayB = dateB.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+
+    return monthDayA.localeCompare(monthDayB);
   })
+}
+
+const findClosestIndex = (arr) => {
+  let closestIndex = 0;
+  let closestDifference = Infinity;
+
+  for (let i = 0; i < arr.length; i++) {
+    const dateParts = arr[i].date.split('-');
+    const month = parseInt(dateParts[1]);
+    const day = parseInt(dateParts[2]);
+
+    const currentDate = new Date(today.value.getFullYear(), month - 1, day); // Создаем дату без года
+
+    const difference = Math.abs(currentDate - today.value);
+
+    if (difference < closestDifference) {
+      closestIndex = i;
+      closestDifference = difference;
+    }
+  }
+
+  return closestIndex;
 }
 
 const add = () => {
@@ -146,9 +137,6 @@ const add = () => {
     id: Date.now(),
     name: newName.value,
     date: newDate.value,
-    day: newDay.value,
-    month: newMonth.value,
-    year: newYear.value,
     edit: false,
     status: 'default'
   }
@@ -165,7 +153,24 @@ const add = () => {
 
 const filteredList = computed(() => {
   if (list.value.length > 1) {
-    const res = sort(list.value)
+    let res = sort(list.value)
+
+    const currentMonth = today.value.getMonth() + 1
+    const currentDate = today.value.getDate()
+
+    const lastArr = []
+    res.forEach(i => {
+      const IMonthArr = i.date.split('-')
+      const IMonth = parseInt(IMonthArr[1])
+      const IDay = parseInt(IMonthArr[2])
+      if (IMonth < currentMonth || IMonth === currentMonth && IDay < currentDate) {
+        lastArr.push(i)
+      }
+    })
+
+    res = [...res, ...lastArr]
+    res = res.slice(lastArr.length)
+
     return res
   }
   return list.value
@@ -190,9 +195,6 @@ const save = (index) => {
   list.value.forEach(i => {
     i.edit = false
   })
-
-  const newArray = sort(list.value)
-  list.value = newArray
 }
 
 const del = (id) => {
