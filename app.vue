@@ -38,10 +38,10 @@
             <div class="d-flex align-items-center me-3">{{ index + 1 }}</div>
             <div v-if="!item.edit" class="d-flex align-items-center p-0">{{ item.name }} {{ item.date }}</div>
             <div class="ms-auto" v-show="!item.edit">
-              <button class="btn btn-warning" v-show="!item.edit" type="button" @click="edit({ index, value: !item.edit })"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-warning" v-show="!item.edit" type="button" @click="edit({ id: item.id, value: !item.edit })"><i class="bi bi-pencil"></i></button>
               <button class="btn btn-danger" v-show="!item.edit" type="button" @click="del(item.id)"><i class="bi bi-trash3"></i></button>
             </div>
-            <form class="col d-flex" @submit.prevent="save(index)" :style="{padding: '0 5px'}" v-if="item.edit">
+            <form class="col d-flex" @submit.prevent="save(item.id)" :style="{padding: '0 5px'}" v-if="item.edit">
               <div class="col-6">
                 <input class="form-control" type="text" placeholder="ФИО" v-model="editName" :required="true">
               </div>
@@ -100,8 +100,8 @@ watch([login, password], () => {
 
 const sort = (arr) => {
   return arr.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
 
     const monthDayA = dateA.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
     const monthDayB = dateB.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
@@ -138,7 +138,6 @@ const currentDate = computed(() => {
 })
 
 const filteredList = computed(() => {
-  if (list.value.length > 1) {
     let res = sort(list.value)
 
     const lastArr = []
@@ -171,31 +170,31 @@ const filteredList = computed(() => {
         i.status = 'text-warning'
       }
     })
-
-    return res
-  }
   return list.value
 })
 
-const edit = ({ index, value }) => {
+const edit = ({ id, value }) => {
   list.value.forEach(i => {
-    i.edit = false
+    if (i.id === id) {
+      i.edit = value
+      editName.value = i.name
+      editDate.value = i.date
+    } else {
+      i.edit = false
+    }
   })
-  list.value[index].edit = value
-  editName.value = list.value[index].name
-  editDate.value = list.value[index].date
 }
 
-const save = (index) => {
-  list.value[index].name = editName.value
-  list.value[index].date = editDate.value
-
-  editName.value = ''
-  editDate.value = ''
-
+const save = (id) => {
   list.value.forEach(i => {
     i.edit = false
+    if (i.id === id) {
+      i.name = editName.value
+      i.date = editDate.value
+    }
   })
+  editName.value = ''
+  editDate.value = ''
 }
 
 const del = (id) => {
