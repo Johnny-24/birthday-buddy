@@ -1,0 +1,180 @@
+/* variables */
+:root {
+  --main-bg-color: #121212;
+  --primary-color: #8687E7;
+}
+
+/* common styles */
+body, h1, h2, h3, h4, h5 {
+  margin: 0;
+  padding: 0;
+}
+
+body * {
+  box-sizing: border-box;
+  outline: none;
+  font-family: "Roboto";
+  font-style: 400px;
+}
+
+a {
+  text-decoration: none;
+}
+
+textarea {
+  resize: none;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+/* helpers */
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mb50 {
+  margin-bottom: 50px;
+}
+.mb25 {
+  margin-bottom: 25px;
+}
+.mb20 {
+  margin-bottom: 20px;
+}
+.mb15 {
+  margin-bottom: 15px;
+}
+.mb10 {
+  margin-bottom: 10px;
+}
+.col {
+  flex-direction: column;
+}
+
+/* main styles*/
+body {
+  background: var(--main-bg-color);
+  height: 100vh;
+  width: 100%;
+}
+
+.container {
+  padding: 0 16px;
+  height: 100%;
+}
+
+.title {
+  color: #fff;
+  opacity: .8;
+  font-weight: 500;
+  font-size: 32px;
+}
+
+.form {
+  width: 100%;
+  max-width: 330px;
+}
+
+.input {
+  width: 100%;
+  background: #1d1d1d;
+  border: 1px solid #979797;
+  height: 48px;
+  border-radius: 12px;
+  padding: 0 12px;
+  color: #fff;
+  font-size: 16px;
+}
+
+.label {
+  color: #fff;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.btn {
+  background: var(--primary-color);
+  border: none;
+  border-radius: 4px;
+  height: 48px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.btn:disabled {
+  opacity: .5;
+}
+
+.link {
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  background: #363636;
+  height: 70px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.header__user {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.header-menu {
+  position: absolute;
+  top: 100%;
+  right: -16px;
+  display: none;
+  margin: 0;
+  width: max-content;
+  background: #363636;
+  border: 1px solid #979797;
+}
+
+.header-menu__item {
+  cursor: pointer;
+  padding: 10px;
+  &:hover {
+    background: var(--primary-color);
+    .header-menu__link {
+      color: #fff;
+    }
+  }
+}
+
+.header-menu__link {
+  color: var(--primary-color);
+}
+
+.header__user:hover {
+  .header-menu {
+    display: block;
+  }
+}
