@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function(){
     window.location = newUrl
   }
 
-  intrance.addEventListener('click', intranceToIndexPage)
+  if(intrance) {
+    intrance.addEventListener('click', intranceToIndexPage)
+  }
 
-});
+})
