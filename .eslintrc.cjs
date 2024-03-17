@@ -11,5 +11,13 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 'latest'
-  }
+  },
+  overrides: [
+    {
+      files: ['*.vue'],
+      rules: {
+        'vue/comment-directive': 'off'
+      }
+    }
+  ]
 }
