@@ -1,0 +1,23 @@
+.button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  min-height: 45px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.variant-primary {
+  background: var(--primary);
+  color: #fff;
+
+}
+
+.variant-transparent {
+  border-radius: 0;
+  min-height: auto;
+}

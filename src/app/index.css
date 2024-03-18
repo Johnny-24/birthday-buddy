@@ -1,6 +1,9 @@
 :root {
   --primary: #9395D3;
   --secondary: #d5d7ef;
+  --gray: #8B8787
+
+  --shadow:0 4px 4px 0 rgba(0,0,0,.25);
 }
 
 * {
@@ -9,6 +12,7 @@
   box-sizing: border-box;
   user-select: none;
   font-family: 'Source Sans 3', sans-serif;
+  outline: none;
 }
 
 text {

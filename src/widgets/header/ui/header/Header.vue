@@ -1,12 +1,14 @@
 <template>
   <header :class="styles.header">
     <Logo />
-    <Icon name="calendar" />
+
+
+    <HeaderLogin />
   </header>
 </template>
 
 <script setup lang="ts">
 import styles from './styles.module.css'
 import Logo from '@/shared/ui/logo'
-import Icon from '@/shared/ui/icon'
+import HeaderLogin from '@/features/header-login'
 </script>

@@ -1,7 +1,11 @@
 <template>
-  <router-link to="/" :class="styles.logo">Birthday Buddy</router-link>
+  <router-link to="/" class="logo">Birthday Buddy</router-link>
 </template>
 
-<script setup lang="ts">
-import styles from './styles.module.css'
-</script>
+<style scoped>
+.logo {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+</style>

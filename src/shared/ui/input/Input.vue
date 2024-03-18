@@ -1,7 +1,5 @@
 <template>
-  <page :class="styles.page">
-    <h1>main page</h1>
-  </page>
+  <input type="text" :class="styles.input">
 </template>
 
 <script setup lang="ts">

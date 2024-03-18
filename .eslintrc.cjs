@@ -16,7 +16,8 @@ module.exports = {
     {
       files: ['*.vue'],
       rules: {
-        'vue/comment-directive': 'off'
+        'vue/comment-directive': 'off',
+        'vue/multi-word-component-names': 'off'
       }
     }
   ]
