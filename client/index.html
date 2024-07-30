@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>birthday buddy</title>
+  </head>
+  <body>
+    <main>
+      <h1>birthday buddy</h1>
+      <form class="form" id="addForm">
+        <div class="form-field">
+          <label for="name">Имя</label>
+          <input type="text" name="name" id="name" />
+          <div class="err" id="name-err">Введите минимум 3 символа</div>
+        </div>
+        <div class="form-field">
+          <label for="date">Дата рождения</label>
+          <input type="date" name="date" id="date" />
+          <div class="err" id="date-err">Введите другую дату</div>
+        </div>
+        <button class="btn-add">Добавить</button>
+      </form>
+      <div class="empty active">Пусто</div>
+      <ul class="list">
+
+        <!-- <li>
+          <h2>Name</h2>
+          <time datetime="2020-01-01">2020-01-01</time>
+          <span>18 years old</span>
+          <form>
+            <div>
+              <label for="name">Name</label>
+              <input type="text" name="name" id="nameItem" />
+            </div>
+            <div>
+              <label for="date">Date</label>
+              <input type="date" name="date" id="dateItem" />
+            </div>
+            <button>Save</button>
+          </form>
+        </li>
+
+        <li>
+          <h2>Name</h2>
+          <time datetime="2020-01-01">2020-01-01</time>
+          <span>18 years old</span>
+          <button>Edit</button>
+          <button>Delete</button>
+        </li> -->
+
+      </ul>
+    </main>
+  </body>
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let list = [];
+
+      const listElement = document.querySelector('.list');
+      const btnDel = document.querySelectorAll('.btn-delete');
+      const btnEdit = document.querySelectorAll('.btn-edit');
+      const btnSave = document.querySelectorAll('.btn-save');
+      const btnAdd = document.querySelectorAll('.btn-add');
+      const nameErr = document.getElementById('name-err');
+      const dateErr = document.getElementById('date-err');
+      const empty = document.querySelector('.empty');
+
+      function renderList(age) {
+        listElement.innerHTML = ''; // Очищаем список перед рендерингом
+        list.forEach(item => {
+          const li = document.createElement('li');
+          li.classList.add('item');
+          li.dataset.id = item.id;
+          li.innerHTML = `
+            <h2>${item.name}</h2>
+            <div class="content">
+              <time datetime="${item.date}">${item.date}</time> /
+              <span>${age} лет</span>
+            </div>
+            <button class="btn-edit">Edit</button>
+            <button class="btn-delete">Delete</button>
+          `;
+          listElement.appendChild(li);
+        });
+      }
+
+      renderList(); // Изначально рендерим список
+
+
+      function del(event) {
+        event.preventDefault(); // Предотвращаем отправку формы
+        const li = event.target.closest('.item');
+        const id = parseInt(li.dataset.id); // Преобразуем id в число
+        list = list.filter(item => item.id !== id); // Сохраняем отфильтрованный массив
+        renderList(); // Обновляем отображение
+        updateDeleteButtons();
+        if (!list.length) {
+          empty.classList.add('active')
+        }
+      }
+
+      // Обновляем обработчики событий после рендеринга
+      function updateDeleteButtons() {
+        const btnDel = document.querySelectorAll('.btn-delete');
+        console.log('btnDel', btnDel)
+        btnDel.forEach(btn => {
+          btn.addEventListener('click', del);
+        });
+      }
+
+      updateDeleteButtons(); // Изначально добавляем обработчики событий
+
+      // Обработка добавления новых элементов
+      document.getElementById('addForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Предотвращаем отправку формы
+        nameErr.classList.remove('active')
+        dateErr.classList.remove('active')
+
+        const name = document.getElementById('name').value;
+        const date = document.getElementById('date').value;
+
+        // Проверка имени
+        if (name.trim().length < 3) {
+          nameErr.classList.add('active')
+          return
+        }
+
+        // Проверка даты
+        const currentDate = new Date();
+        const selectedDate = new Date(date);
+        const currentYear = currentDate.getFullYear();
+        const selectedYear = selectedDate.getFullYear();
+        const age = currentYear - selectedYear;
+
+        if (selectedDate > currentDate || !date) {
+          dateErr.classList.add('active')
+          return
+        }
+
+        const newId = list.length ? Math.max(...list.map(item => item.id)) + 1 : 1; // Генерируем новый id
+        list.push({ id: newId, name, date }); // Добавляем новый элемент в массив
+        renderList(age); // Обновляем отображение списка
+        updateDeleteButtons(); // Обновляем обработчики событий
+
+        // Очищаем форму
+        document.getElementById('name').value = '';
+        document.getElementById('date').value = '';
+
+        empty.classList.remove('active')
+      });
+    });
+  </script>
+
+
+
+
+
+
+<style>
+  .empty {
+    display: none;
+    margin-top: 20px;
+  }
+  .active {
+    display: block !important;
+  }
+  .err {
+    font-size: 12px;
+    color:red;
+    display: none;
+  }
+  main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+.item form {
+  display: none;
+}
+
+.form {
+  border: 1px solid black;
+  padding: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.list {
+  max-height: 50%;
+  overflow: auto;
+}
+</style>
